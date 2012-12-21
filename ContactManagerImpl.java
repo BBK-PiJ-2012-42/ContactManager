@@ -4,19 +4,23 @@
  */
 package contactmanager;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
  * @author tom
  */
 public class ContactManagerImpl implements ContactManager {
+    Set<Contact> allContacts = new HashSet();
+    Set<Meeting> allMeetings = new HashSet();
     
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(date.after(timeNow()) || !contactsExist(contacts)) {
+            throw new IllegalArgumentException();
+        } else {
+            
+        } 
     }
 
     @Override
@@ -31,7 +35,17 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public Meeting getMeeting(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Iterator meetingIterator = allMeetings.iterator();
+        Meeting nextMeeting;
+        int nextId;
+        while(meetingIterator.hasNext()) {
+            nextMeeting = (Meeting) meetingIterator.next();
+            nextId = nextMeeting.getId();
+            if(nextId == id) {
+                return nextMeeting;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -77,5 +91,32 @@ public class ContactManagerImpl implements ContactManager {
     @Override
     public void flush() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    private Calendar timeNow() {
+        return Calendar.getInstance();
+    }
+    
+    private boolean contactExists(Contact contact) {
+        return false;
+    }
+    
+    private boolean contactsExist(Set<Contact> contacts) {
+        Iterator contactsIterator = contacts.iterator();
+        boolean result = true;
+        while(contactsIterator.hasNext()) {
+            if(!contactExists((Contact) contactsIterator.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private int generateMeetingID() {
+        int newId = (int)(Math.random()*999999);
+        if(this.getMeeting(newId) == void) {
+        
+        }
+        return newId;
     }
 }

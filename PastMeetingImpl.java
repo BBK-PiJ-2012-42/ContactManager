@@ -9,6 +9,8 @@ package contactmanager;
  * @author tom
  */
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
+    
+    private String notes;
 
     @Override
     public String getNotes() {

@@ -18,6 +18,7 @@ import java.util.Set;
     * of if any contact is unknown / non-existent
     */
     int addFutureMeeting(Set<Contact> contacts, Calendar date);
+    
     /**
     * Returns the PAST meeting with the requested ID, or null if it there is none.
     *
@@ -27,6 +28,7 @@ import java.util.Set;
     1
     */
     PastMeeting getPastMeeting(int id);
+    
     /**
     * Returns the FUTURE meeting with the requested ID, or null if there is none.
     *
@@ -35,6 +37,7 @@ import java.util.Set;
     * @throws IllegalArgumentException if there is a meeting with that ID happening in the past
     */
     FutureMeeting getFutureMeeting(int id);
+    
     /**
     * Returns the meeting with the requested ID, or null if it there is none.
     *
@@ -42,6 +45,7 @@ import java.util.Set;
     * @return the meeting with the requested ID, or null if it there is none.
     */
     Meeting getMeeting(int id);
+    
     /**
     * Returns the list of future meetings scheduled with this contact.
     *
@@ -54,6 +58,7 @@ import java.util.Set;
     * @throws IllegalArgumentException if the contact does not exist
     */
     List<Meeting> getFutureMeetingList(Contact contact);
+    
     /**
     * Returns the list of meetings that are scheduled for, or that took
     * place on, the specified date
@@ -66,6 +71,7 @@ import java.util.Set;
     * @return the list of meetings
     */
     List<Meeting> getFutureMeetingList(Calendar date);
+    
     /**
     * Returns the list of past meetings in which this contact has participated.
     *
@@ -79,6 +85,7 @@ import java.util.Set;
     2
     */
     List<PastMeeting> getPastMeetingList(Contact contact);
+    
     /**
     * Create a new record for a meeting that took place in the past.
     *
@@ -90,6 +97,7 @@ import java.util.Set;
     * @throws NullPointerException if any of the arguments is null
     */
     void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text);
+    
     /**
     * Add notes to a meeting.
     *
@@ -105,6 +113,7 @@ import java.util.Set;
     * @throws NullPointerException if the notes are null
     */
     void addMeetingNotes(int id, String text);
+    
     /**
     * Create a new contact with the specified name and notes.
     *
@@ -113,6 +122,7 @@ import java.util.Set;
     * @throws NullPointerException if the name or the notes are null
     */
     void addNewContact(String name, String notes);
+    
     /**
     * Returns a list containing the contacts that correspond to the IDs.
     *
@@ -121,6 +131,7 @@ import java.util.Set;
     * @throws IllegalArgumentException if any of the IDs does not correspond to a real contact
     */
     Set<Contact> getContacts(int... ids);
+    
     /**
     * Returns a list with the contacts whose name contains that string.
     *

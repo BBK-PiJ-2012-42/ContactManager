@@ -9,6 +9,15 @@ package contactmanager;
  * @author tom
  */
 public class ContactImpl implements Contact {
+    private String id;
+    private String name;
+    private String notes;
+    
+    public void ContactImpl(String id, String name) {
+        this.id = id;
+        this.name = name;
+        
+    }
 
     @Override
     public int getId() {

@@ -12,20 +12,29 @@ import java.util.Set;
  * @author tom
  */
 public class MeetingImpl implements Meeting {
+    private int id;
+    private Calendar date;
+    private Set<Contact> attendees;
+    
+    MeetingImpl(int id, Calendar date, Set<Contact> attendees) {
+        this.id = id;
+        this.date = date;
+        this.attendees = attendees;
+    }
 
     @Override
     public int getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return id;
     }
 
     @Override
     public Calendar getDate() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return date;
     }
 
     @Override
     public Set<Contact> getContacts() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return attendees;
     }
     
 }
