@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package contactmanager;
 
 import java.util.*;
@@ -19,18 +15,41 @@ public class ContactManagerImpl implements ContactManager {
         if(date.after(timeNow()) || !contactsExist(contacts)) {
             throw new IllegalArgumentException();
         } else {
-            
+            int id = generateMeetingId();
+            allMeetings.add(new FutureMeetingImpl(id, date, contacts));
+            return id;
         } 
     }
 
     @Override
     public PastMeeting getPastMeeting(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Meeting returnMeeting = getMeeting(id);
+        if(returnMeeting != null) {
+            if(returnMeeting.getDate().after(timeNow())) {
+                throw new IllegalArgumentException();
+            } else {
+                return (PastMeetingImpl) returnMeeting;
+            } 
+        } else {
+            return null;
+        }  
     }
 
     @Override
     public FutureMeeting getFutureMeeting(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Meeting returnMeeting = getMeeting(id);
+        if(returnMeeting != null) {
+            // Added a check to see if the meeting is now in the past
+            // and throws and exception if this is the case. This is not in
+            // the specification.
+            if(returnMeeting.getDate().before(timeNow())) {
+                throw new IllegalArgumentException();
+            } else {
+                return (FutureMeetingImpl) returnMeeting;
+            } 
+        } else {
+            return null;
+        }  
     }
 
     @Override
@@ -50,17 +69,55 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public List<Meeting> getFutureMeetingList(Contact contact) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // not yet sorted
+        Iterator meetingIterator = allMeetings.iterator();
+        Meeting nextMeeting;
+        Calendar nextCal;
+        List<Meeting> returnList = new ArrayList<>();
+        while(meetingIterator.hasNext()) {
+            nextMeeting = (Meeting) meetingIterator.next();
+            nextCal = nextMeeting.getDate();
+            if(nextCal.after(timeNow()) && nextMeeting.getContacts().contains(contact)) {
+                returnList.add(nextMeeting);
+            }
+        }
+        return returnList;
     }
 
     @Override
     public List<Meeting> getFutureMeetingList(Calendar date) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Iterator meetingIterator = allMeetings.iterator();
+        Meeting nextMeeting;
+        Calendar nextCal;
+        List<Meeting> returnList = new ArrayList<>();
+        while(meetingIterator.hasNext()) {
+            nextMeeting = (Meeting) meetingIterator.next();
+            nextCal = nextMeeting.getDate();
+            if(nextCal.equals(date)) {
+                returnList.add(nextMeeting);
+            }
+        }
+        return returnList;
     }
 
     @Override
     public List<PastMeeting> getPastMeetingList(Contact contact) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(contactExists(contact)) {
+            Iterator meetingIterator = allMeetings.iterator();
+            Meeting nextMeeting;
+            Calendar nextCal;
+            List<PastMeeting> returnList = new ArrayList<>();
+            while(meetingIterator.hasNext()) {
+                nextMeeting = (Meeting) meetingIterator.next();
+                nextCal = nextMeeting.getDate();
+                if(nextCal.after(timeNow()) && nextMeeting.getContacts().contains(contact)) {
+                    returnList.add((PastMeetingImpl) nextMeeting);
+                }
+            }
+            return returnList;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -103,7 +160,6 @@ public class ContactManagerImpl implements ContactManager {
     
     private boolean contactsExist(Set<Contact> contacts) {
         Iterator contactsIterator = contacts.iterator();
-        boolean result = true;
         while(contactsIterator.hasNext()) {
             if(!contactExists((Contact) contactsIterator.next())) {
                 return false;
@@ -112,11 +168,36 @@ public class ContactManagerImpl implements ContactManager {
         return true;
     }
     
-    private int generateMeetingID() {
+    private int generateMeetingId() {
         int newId = (int)(Math.random()*999999);
-        if(this.getMeeting(newId) == void) {
-        
+        if(getMeeting(newId) != null) {
+            return generateMeetingId(); 
+        } else {
+            return newId;
         }
-        return newId;
+    }
+   
+    private int generateContactId() {
+        int newId = (int)(Math.random()*999999);
+        if(getContacts(newId) != null) {
+            return generateContactId(); 
+        } else {
+            return newId;
+        }
+    }
+    
+    private List<Meeting> getFutureMeetings() {
+        Iterator meetingIterator = allMeetings.iterator();
+        Meeting nextMeeting;
+        Calendar nextCal;
+        List<Meeting> returnList = new ArrayList<>();
+        while(meetingIterator.hasNext()) {
+            nextMeeting = (Meeting) meetingIterator.next();
+            nextCal = nextMeeting.getDate();
+            if(nextCal.after(timeNow())) {
+                returnList.add(nextMeeting);
+            }
+        }
+        return returnList;
     }
 }
