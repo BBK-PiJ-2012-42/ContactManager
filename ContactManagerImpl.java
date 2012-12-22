@@ -135,7 +135,19 @@ public class ContactManagerImpl implements ContactManager {
     @Override
     public void addMeetingNotes(int id, String text) {
         if(text != null) {
-            
+            Meeting newMeeting = getMeeting(id);
+            if(newMeeting != null) {
+                if(newMeeting.getDate().before(timeNow())) {
+                    throw new IllegalStateException();
+                } else {
+                    PastMeetingImpl newPastMeeting = (PastMeetingImpl) newMeeting;
+                    newPastMeeting.setNotes(text);
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            throw new NullPointerException();
         }
 //        Iterator meetingIterator = allMeetings.iterator();
 //        Meeting nextMeeting;
