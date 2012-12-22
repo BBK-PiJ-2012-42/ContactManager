@@ -13,17 +13,19 @@ import java.util.Set;
  */
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
     
-    private String notes;
+    private String notes = "";
 
     public PastMeetingImpl(int id, Calendar date, Set<Contact> attendees) {
         super(id, date, attendees);
     }
     
-    
-
     @Override
     public String getNotes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return notes;
+    }
+    
+    public void setNotes(String text) {
+        this.notes = text;
     }
     
 }
