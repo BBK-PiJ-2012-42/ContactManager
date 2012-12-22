@@ -122,29 +122,39 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
-        Iterator meetingIterator = allMeetings.iterator();
-        Meeting nextMeeting;
-        Calendar nextCal;
-        PastMeetingImpl newPastMeeting = null;
-        while(meetingIterator.hasNext()) {
-            nextMeeting = (Meeting) meetingIterator.next();
-            nextCal = nextMeeting.getDate();
-            if(nextCal.equals(date) && nextMeeting.getContacts().equals(contacts)) {
-                if(!(nextMeeting instanceof PastMeetingImpl))
-                    newPastMeeting = (PastMeetingImpl) nextMeeting;
-                    newPastMeeting.setNotes(text);
-                    allMeetings.add(newPastMeeting);
-                    allMeetings.remove(nextMeeting);
-                } else {
-                    ((PastMeetingImpl) nextMeeting).setNotes(text);
-            }
-            break;
+        if(contacts.isEmpty() || !contactsExist(contacts)) {
+            throw new IllegalArgumentException();
+        } else if(contacts != null && date != null && text != null) {
+            PastMeetingImpl newMeeting = new PastMeetingImpl(generateMeetingId(), date, contacts);
+            newMeeting.setNotes(text);
+        } else {
+            throw new NullPointerException();
         }
     }
 
     @Override
     public void addMeetingNotes(int id, String text) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(text != null) {
+            
+        }
+//        Iterator meetingIterator = allMeetings.iterator();
+//        Meeting nextMeeting;
+//        Calendar nextCal;
+//        PastMeetingImpl newPastMeeting = null;
+//        while(meetingIterator.hasNext()) {
+//            nextMeeting = (Meeting) meetingIterator.next();
+//            nextCal = nextMeeting.getDate();
+//            if(nextCal.equals(date) && nextMeeting.getContacts().equals(contacts)) {
+//                if(!(nextMeeting instanceof PastMeetingImpl))
+//                    newPastMeeting = (PastMeetingImpl) nextMeeting;
+//                    newPastMeeting.setNotes(text);
+//                    allMeetings.add(newPastMeeting);
+//                    allMeetings.remove(nextMeeting);
+//                } else {
+//                    ((PastMeetingImpl) nextMeeting).setNotes(text);
+//            }
+//            break;
+//        }
     }
 
     @Override
