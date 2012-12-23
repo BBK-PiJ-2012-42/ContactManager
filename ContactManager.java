@@ -7,7 +7,8 @@ import java.util.Set;
 /**
 * A class to manage your contacts and meetings.
 */
-    public interface ContactManager {
+public interface ContactManager {
+        
     /**
     * Add a new meeting to be held in the future.
     *
