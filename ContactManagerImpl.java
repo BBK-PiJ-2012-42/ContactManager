@@ -41,7 +41,8 @@ public class ContactManagerImpl implements ContactManager {
         if(returnMeeting != null) {
             // Added a check to see if the meeting is now in the past
             // and throws and exception if this is the case. This is not in
-            // the specification.
+            // the specification but seems appropriate given that the same
+            // exception is given in the getPastMeeting method.
             if(returnMeeting.getDate().before(timeNow())) {
                 throw new IllegalArgumentException();
             } else {
@@ -171,7 +172,8 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public void addNewContact(String name, String notes) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Contact newContact = new ContactImpl(generateContactId(), name);
+        allContacts.add(newContact);
     }
 
     @Override
@@ -225,18 +227,23 @@ public class ContactManagerImpl implements ContactManager {
         }
     }
     
-    private List<Meeting> getFutureMeetings() {
-        Iterator meetingIterator = allMeetings.iterator();
-        Meeting nextMeeting;
-        Calendar nextCal;
-        List<Meeting> returnList = new ArrayList<>();
-        while(meetingIterator.hasNext()) {
-            nextMeeting = (Meeting) meetingIterator.next();
-            nextCal = nextMeeting.getDate();
-            if(nextCal.after(timeNow())) {
-                returnList.add(nextMeeting);
-            }
-        }
-        return returnList;
+    private ArrayList<Meeting> sortMeetingList() {
+        ArrayList<Meeting> sortedList = new ArrayList<>();
+        return sortedList;
     }
+    
+//    private List<Meeting> getFutureMeetings() {
+//        Iterator meetingIterator = allMeetings.iterator();
+//        Meeting nextMeeting;
+//        Calendar nextCal;
+//        List<Meeting> returnList = new ArrayList<>();
+//        while(meetingIterator.hasNext()) {
+//            nextMeeting = (Meeting) meetingIterator.next();
+//            nextCal = nextMeeting.getDate();
+//            if(nextCal.after(timeNow())) {
+//                returnList.add(nextMeeting);
+//            }
+////        }
+////        return returnList;
+//    }
 }

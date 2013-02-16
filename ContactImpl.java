@@ -9,11 +9,11 @@ package contactmanager;
  * @author tom
  */
 public class ContactImpl implements Contact {
-    private String id;
+    private int id;
     private String name;
-    private String notes;
+    private String notes = null;
     
-    public void ContactImpl(String id, String name) {
+    public ContactImpl(int id, String name) {
         this.id = id;
         this.name = name;
         
@@ -21,22 +21,25 @@ public class ContactImpl implements Contact {
 
     @Override
     public int getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return id;
     }
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return name;
     }
 
     @Override
     public String getNotes() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return notes;
     }
 
     @Override
     public void addNotes(String note) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(notes != null) {
+            notes += "\n";
+        }
+        notes += note;
     }
     
 }
