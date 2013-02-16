@@ -9,6 +9,12 @@ import java.util.*;
 public class ContactManagerImpl implements ContactManager {
     Set<Contact> allContacts = new HashSet();
     Set<Meeting> allMeetings = new HashSet();
+    private static Comparator<Meeting> dateSorter = new Comparator<Meeting>() {
+        @Override
+        public int compare(Meeting o1, Meeting o2) {
+            return o1.getDate().compareTo(o2.getDate());
+        }
+    };
     
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
@@ -70,7 +76,6 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public List<Meeting> getFutureMeetingList(Contact contact) {
-        // not yet sorted
         Iterator meetingIterator = allMeetings.iterator();
         Meeting nextMeeting;
         Calendar nextCal;
@@ -82,6 +87,8 @@ public class ContactManagerImpl implements ContactManager {
                 returnList.add(nextMeeting);
             }
         }
+        // Sorts list using the Comparator from Java Collections.
+        Collections.sort(returnList, dateSorter);
         return returnList;
     }
 
@@ -115,6 +122,8 @@ public class ContactManagerImpl implements ContactManager {
                     returnList.add((PastMeetingImpl) nextMeeting);
                 }
             }
+            // Sorts list using the Comparator from Java Collections.
+            Collections.sort(returnList, dateSorter);
             return returnList;
         } else {
             throw new IllegalArgumentException();
@@ -172,13 +181,27 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public void addNewContact(String name, String notes) {
-        Contact newContact = new ContactImpl(generateContactId(), name);
-        allContacts.add(newContact);
+        if(name != null && notes != null) {
+            Contact newContact = new ContactImpl(generateContactId(), name);
+            allContacts.add(newContact);            
+        } else {
+            throw new NullPointerException();
+        }
     }
 
     @Override
     public Set<Contact> getContacts(int... ids) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Set<Contact> contacts = new HashSet<>();
+        Contact retrievedContact;
+        for(int eachID : ids) {
+            retrievedContact = getContactFromID(eachID);
+            if(retrievedContact != null) {
+                contacts.add(retrievedContact);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+        return contacts;
     }
 
     @Override
@@ -227,10 +250,21 @@ public class ContactManagerImpl implements ContactManager {
         }
     }
     
-    private ArrayList<Meeting> sortMeetingList() {
-        ArrayList<Meeting> sortedList = new ArrayList<>();
-        return sortedList;
+    private Contact getContactFromID(int id) {
+        Iterator contactIterator = allContacts.iterator();
+        Contact nextContact;
+        while(contactIterator.hasNext()) {
+            nextContact = (Contact) contactIterator.next();
+            if(nextContact.getId() == id) {
+                return nextContact;
+            }
+        }
+        return null;
     }
+      
+
+    
+    
     
 //    private List<Meeting> getFutureMeetings() {
 //        Iterator meetingIterator = allMeetings.iterator();
