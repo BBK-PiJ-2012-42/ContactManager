@@ -13,7 +13,7 @@ import javax.xml.crypto.Data;
  */
 public class Launch {
     public static void main(String[] args) {
-        Launch.restart();
+        Launch.start();
     }
     
     public static void start() {
@@ -29,10 +29,26 @@ public class Launch {
         }
         
         Calendar date = new GregorianCalendar();
-        date.set(2013, 03, 23, 14, 0) ;
+        date.set(2013, 03, 23, 14, 0);
+        System.out.println(date.toString());
+        
+        Calendar oldDate = new GregorianCalendar();
+        date.set(2013, 01, 23, 14, 0);
         
         manager.addFutureMeeting(contacts, date);
+        
+        manager.addNewPastMeeting(contacts, oldDate, "We all agreed that was a great meeting.");
+        
         manager.flush();
+        
+        Set<Contact> newcontacts = manager.getContacts("Bill");
+        for(Contact each : newcontacts) {
+            List<PastMeeting> meets = manager.getPastMeetingList(each);
+            System.out.println(meets.get(0));
+        }
+        
+        
+        
         
     }
     

@@ -128,7 +128,7 @@ public class ContactManagerImpl implements ContactManager {
                 nextMeeting = (Meeting) meetingIterator.next();
                 nextCal = nextMeeting.getDate();
                 if(nextCal.after(timeNow()) && nextMeeting.getContacts().contains(contact)) {
-                    returnList.add((PastMeetingImpl) nextMeeting);
+                    returnList.add((PastMeeting) nextMeeting);
                 }
             }
             // Sorts list using the Comparator from Java Collections.
@@ -146,6 +146,8 @@ public class ContactManagerImpl implements ContactManager {
         } else if(contacts != null && date != null && text != null) {
             PastMeetingImpl newMeeting = new PastMeetingImpl(generateMeetingId(), date, contacts);
             newMeeting.setNotes(text);
+            //
+            System.out.println("past");
         } else {
             throw new NullPointerException();
         }
@@ -243,14 +245,22 @@ public class ContactManagerImpl implements ContactManager {
     private void printToFile() throws IOException {
         // Writes the current state of the ContactManager to a CSV File.
         BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
-        CSVFile.write("::CONTACTS::\n");
+        //CSVFile.write("::CONTACTS::\n");
         for(Contact eachContact : allContacts) {
-            CSVFile.write(eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
+            CSVFile.write("contact,"+eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
         }
-        CSVFile.write("::MEETINGS::\n");
+        //CSVFile.write("::MEETINGS::\n");
         for(Meeting eachMeeting : allMeetings) {
-            CSVFile.write(eachMeeting.getId()+","+serialDate(eachMeeting.getDate())+
+            if(eachMeeting instanceof PastMeetingImpl) {
+                System.out.println("PAST");
+                PastMeeting eachPastMeeting = (PastMeeting) eachMeeting;
+                CSVFile.write("pastmeeting,"+eachPastMeeting.getId()+","+serialDate(eachPastMeeting.getDate())+
+                    ","+serialContactSet(eachPastMeeting.getContacts())+eachPastMeeting.getNotes()+"\n");
+            } else {
+                CSVFile.write("meeting,"+eachMeeting.getId()+","+serialDate(eachMeeting.getDate())+
                     ","+serialContactSet(eachMeeting.getContacts())+"\n");
+            }
+
         }
         CSVFile.close();
     }
@@ -258,13 +268,25 @@ public class ContactManagerImpl implements ContactManager {
     private void initialise() throws IOException {
         // Reads the state of the ContactManager from a CSV File.
         BufferedReader CSVFile = new BufferedReader(new FileReader(fileName));
-        
+        String dataRow = CSVFile.readLine();
+        // Reads each line until the end of the file.
+        while (dataRow != null) {
+            String[] stringArray = dataRow.split(",");
+            // Checks to see if the line contains a contact or a meeting.
+            //if(stringArray)    
+            dataRow = CSVFile.readLine();
+        }
         CSVFile.close();
     }
     
     private String serialDate(Calendar date) {
         // Serialises Calendar objects to a readable string.
-        return "["+date.YEAR+","+date.MONTH+","+date.DAY_OF_MONTH+","+date.HOUR_OF_DAY+","+date.MINUTE+"]";
+        return "["+
+                date.get(Calendar.YEAR)+","+
+                date.get(Calendar.MONTH)+","+
+                date.get(Calendar.DAY_OF_MONTH)+","+
+                date.get(Calendar.HOUR_OF_DAY)+","+
+                date.get(Calendar.MINUTE)+"]";
     }
     
     private String serialContactSet(Set<Contact> contactSet) {
