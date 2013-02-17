@@ -24,6 +24,9 @@ public class Launch {
         manager.addNewContact("Sue Smith", "");
         
         Set<Contact> contacts = manager.getContacts("Smith");
+        for(Contact each : contacts) {
+            System.out.println(each.getId()+" "+each.getName());
+        }
         
         Calendar date = new GregorianCalendar();
         date.set(Calendar.YEAR, 2013);
