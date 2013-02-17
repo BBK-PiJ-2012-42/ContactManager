@@ -7,7 +7,7 @@ import java.util.*;
  *
  * @author tom
  */
-public class ContactManagerImpl implements ContactManager {
+public class ContactManagerImpl implements ContactManager {  
     String fileName = "./contacts.txt";
     Set<Contact> allContacts = new HashSet();
     Set<Meeting> allMeetings = new HashSet();
@@ -19,7 +19,17 @@ public class ContactManagerImpl implements ContactManager {
     };
 
     public ContactManagerImpl() throws IOException {
+        // Load the previous state.
         initialise();
+    }
+    
+    public ContactManagerImpl(int loadFlag) throws IOException {
+        // Constructor for testing when a ContactManagerImpl object is required
+        // that does not load its state from a file.
+        if(loadFlag != 0) {
+            // Load the previous state.
+            initialise();
+        }
     }
     
     @Override
@@ -221,7 +231,7 @@ public class ContactManagerImpl implements ContactManager {
     
     private void printToFile() throws IOException {
         // Writes the current state of the ContactManager to a CSV File.
-        BufferedWriter CSVFile = new BufferedWriter(new FileWriter("./contacts2.txt"));
+        BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
         for(Contact eachContact : allContacts) {
             CSVFile.write("contact,"+eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
         }
@@ -238,35 +248,64 @@ public class ContactManagerImpl implements ContactManager {
         CSVFile.close();
     }
     
+    public void printToConsole() {
+        // Outputs to console what would be sent to the file.
+        for(Contact eachContact : allContacts) {
+            System.out.print("contact,"+eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
+        }
+        for(Meeting eachMeeting : allMeetings) {
+            if(eachMeeting instanceof PastMeeting) {
+                PastMeeting eachPastMeeting = (PastMeeting) eachMeeting;
+                System.out.print("pastmeeting,"+eachPastMeeting.getId()+","+serialDate(eachPastMeeting.getDate())+
+                    ","+serialContactSet(eachPastMeeting.getContacts())+","+eachPastMeeting.getNotes()+"\n");
+            } else {
+                System.out.print("meeting,"+eachMeeting.getId()+","+serialDate(eachMeeting.getDate())+
+                    ","+serialContactSet(eachMeeting.getContacts())+"\n");
+            }
+        }
+    }
+    
     private void initialise() throws IOException {
         // Reads the state of the ContactManager from a CSV File.
         BufferedReader CSVFile = new BufferedReader(new FileReader(fileName));
         String dataRow = CSVFile.readLine();
+        
+//        System.out.println(dataRow);
+        
         // Reads each line until the end of the file.
         while (dataRow != null) {
             String[] stringArray = dataRow.split(",");
+            
+            
+//            System.out.println(stringArray.toString());
+//            System.out.println(stringArray[1]);
+            
             // Checks to see if the line contains a contact or a meeting.
-            int newID = Integer.getInteger(stringArray[1]);
+            int newID = Integer.parseInt(stringArray[1]);
             if(stringArray[0].equals("contact")) {
-                loadContact(newID, stringArray[2], stringArray[3]);
+                if(stringArray.length > 3) {
+                    loadContact(newID, stringArray[2], stringArray[3]);
+                } else {
+                    loadContact(newID, stringArray[2], "");
+                }
             } else {
                 
                 // Deserialise the string into a Calendar Object.
                 String[] dateArray = stringArray[2].split("/");
                 Calendar newDate = new GregorianCalendar();
                 newDate.set(
-                        Integer.getInteger(dateArray[0]),
-                        Integer.getInteger(dateArray[1]),
-                        Integer.getInteger(dateArray[2]),
-                        Integer.getInteger(dateArray[3]),
-                        Integer.getInteger(dateArray[4]));
+                        Integer.parseInt(dateArray[0]),
+                        Integer.parseInt(dateArray[1]),
+                        Integer.parseInt(dateArray[2]),
+                        Integer.parseInt(dateArray[3]),
+                        Integer.parseInt(dateArray[4]));
                 
                 
                 // Deserialise the string into a contact set.
                 String[] contactArray = stringArray[3].split("/");
                 Set<Contact> newContacts = new HashSet<>();
                 for(String eachIDasString : contactArray) {
-                    Contact newContact = getContactFromID(Integer.getInteger(eachIDasString));
+                    Contact newContact = getContactFromID(Integer.parseInt(eachIDasString));
                     newContacts.add(newContact);
                 }
                 if(stringArray[0].equals("meeting")) {
@@ -372,7 +411,7 @@ public class ContactManagerImpl implements ContactManager {
         }
     }
     
-    private Contact getContactFromID(int id) {
+    public Contact getContactFromID(int id) {
         Iterator contactIterator = allContacts.iterator();
         Contact nextContact;
         while(contactIterator.hasNext()) {
@@ -391,7 +430,7 @@ public class ContactManagerImpl implements ContactManager {
             CSVFile.newLine();
             CSVFile.close();
         } catch (IOException ex) {
-            //Logger.getLogger(ContactManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }        
     }
       
