@@ -335,7 +335,7 @@ public class ContactManagerImpl implements ContactManager {
         allContacts.add(newContact);
     } 
     
-    private String serialDate(Calendar date) {
+    public String serialDate(Calendar date) {
         // Serialises Calendar objects to a readable string.
         return  date.get(Calendar.YEAR)+"/"+
                 date.get(Calendar.MONTH)+"/"+

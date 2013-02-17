@@ -6,7 +6,6 @@ package contactmanager;
 
 import java.io.IOException;
 import java.util.*;
-import javax.xml.crypto.Data;
 
 
 /**
@@ -50,14 +49,17 @@ public class Launch {
     }
     
     public static void restart() throws IOException {
-        ContactManager loadedManager = new ContactManagerImpl();
+        ContactManagerImpl loadedManager = new ContactManagerImpl();
         ((ContactManagerImpl) loadedManager).printToConsole();
         
         Set<Contact> loadedContacts = loadedManager.getContacts("Smith");
         
-        ((ContactManagerImpl) loadedManager).getContactFromID(id)
+        Contact contact = loadedManager.getContactFromID(881627);
 
-        loadedManager.getFutureMeetingList(null)
+        List<Meeting> meetingList = loadedManager.getFutureMeetingList(contact);
+        for(Meeting meeting : meetingList) {
+            System.out.println(meeting.getId()+" "+loadedManager.serialDate(meeting.getDate()));
+        }
     }
     
 
