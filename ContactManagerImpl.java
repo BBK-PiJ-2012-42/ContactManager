@@ -1,12 +1,17 @@
 package contactmanager;
 
+import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import sun.security.pkcs11.wrapper.CK_SSL3_MASTER_KEY_DERIVE_PARAMS;
 
 /**
  *
  * @author tom
  */
 public class ContactManagerImpl implements ContactManager {
+    String fileName = "./contacts.txt";
     Set<Contact> allContacts = new HashSet();
     Set<Meeting> allMeetings = new HashSet();
     private static Comparator<Meeting> dateSorter = new Comparator<Meeting>() {
@@ -18,7 +23,7 @@ public class ContactManagerImpl implements ContactManager {
     
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-        if(date.after(timeNow()) || !contactsExist(contacts)) {
+        if(date.before(timeNow()) || !contactsExist(contacts)) {
             throw new IllegalArgumentException();
         } else {
             int id = generateMeetingId();
@@ -206,12 +211,32 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public Set<Contact> getContacts(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(name != null) {
+            Set<Contact> contacts = new HashSet<>();
+            Iterator contactIterator = allContacts.iterator();
+            Contact nextContact;
+            while(contactIterator.hasNext()) {
+                nextContact = (Contact) contactIterator.next();
+                if(nextContact.getName().contains(name)) {
+                    contacts.add(nextContact);
+                }
+            }
+            return contacts;
+        } else {
+            throw new NullPointerException();
+        }   
     }
 
     @Override
     public void flush() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        writeLine("::CONTACTS::");
+        for(Contact eachContact : allContacts) {
+            writeLine(eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes());
+        }
+        writeLine("::MEETINGS::");
+        for(Meeting eachMeeting : allMeetings) {
+            writeLine(eachMeeting.getId()+","+eachMeeting.getDate());
+        }
     }
     
     private Calendar timeNow() {
@@ -219,7 +244,11 @@ public class ContactManagerImpl implements ContactManager {
     }
     
     private boolean contactExists(Contact contact) {
-        return false;
+        if(allContacts.contains(contact)) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     private boolean contactsExist(Set<Contact> contacts) {
@@ -233,17 +262,33 @@ public class ContactManagerImpl implements ContactManager {
     }
     
     private int generateMeetingId() {
+        // Generates a random 6 digit integer as the ID number.
         int newId = (int)(Math.random()*999999);
+        // Then checks to see if this number is already in use recursively.
         if(getMeeting(newId) != null) {
             return generateMeetingId(); 
         } else {
             return newId;
         }
     }
+    
+    private Meeting getMeetingFromID(int id) {
+        Iterator meetingIterator = allMeetings.iterator();
+        Meeting nextMeeting;
+        while(meetingIterator.hasNext()) {
+            nextMeeting = (Meeting) meetingIterator.next();
+            if(nextMeeting.getId() == id) {
+                return nextMeeting;
+            }
+        }
+        return null;
+    }
    
     private int generateContactId() {
+        // Generates a random 6 digit integer as the ID number.
         int newId = (int)(Math.random()*999999);
-        if(getContacts(newId) != null) {
+        // Then checks to see if this number is already in use recursively.
+        if(getContactFromID(newId) != null) {
             return generateContactId(); 
         } else {
             return newId;
@@ -261,23 +306,15 @@ public class ContactManagerImpl implements ContactManager {
         }
         return null;
     }
+    
+    private void writeLine(String line) {
+        try {
+            BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
+            CSVFile.write(line);
+            CSVFile.newLine();
+        } catch (IOException ex) {
+            //Logger.getLogger(ContactManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }
       
-
-    
-    
-    
-//    private List<Meeting> getFutureMeetings() {
-//        Iterator meetingIterator = allMeetings.iterator();
-//        Meeting nextMeeting;
-//        Calendar nextCal;
-//        List<Meeting> returnList = new ArrayList<>();
-//        while(meetingIterator.hasNext()) {
-//            nextMeeting = (Meeting) meetingIterator.next();
-//            nextCal = nextMeeting.getDate();
-//            if(nextCal.after(timeNow())) {
-//                returnList.add(nextMeeting);
-//            }
-////        }
-////        return returnList;
-//    }
 }
