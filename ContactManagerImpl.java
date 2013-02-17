@@ -168,24 +168,6 @@ public class ContactManagerImpl implements ContactManager {
         } else {
             throw new NullPointerException();
         }
-//        Iterator meetingIterator = allMeetings.iterator();
-//        Meeting nextMeeting;
-//        Calendar nextCal;
-//        PastMeetingImpl newPastMeeting = null;
-//        while(meetingIterator.hasNext()) {
-//            nextMeeting = (Meeting) meetingIterator.next();
-//            nextCal = nextMeeting.getDate();
-//            if(nextCal.equals(date) && nextMeeting.getContacts().equals(contacts)) {
-//                if(!(nextMeeting instanceof PastMeetingImpl))
-//                    newPastMeeting = (PastMeetingImpl) nextMeeting;
-//                    newPastMeeting.setNotes(text);
-//                    allMeetings.add(newPastMeeting);
-//                    allMeetings.remove(nextMeeting);
-//                } else {
-//                    ((PastMeetingImpl) nextMeeting).setNotes(text);
-//            }
-//            break;
-//        }
     }
 
     @Override
@@ -248,10 +230,9 @@ public class ContactManagerImpl implements ContactManager {
         }
         for(Meeting eachMeeting : allMeetings) {
             if(eachMeeting instanceof PastMeeting) {
-                System.out.println("PAST");
                 PastMeeting eachPastMeeting = (PastMeeting) eachMeeting;
                 CSVFile.write("pastmeeting,"+eachPastMeeting.getId()+","+serialDate(eachPastMeeting.getDate())+
-                    ","+serialContactSet(eachPastMeeting.getContacts())+eachPastMeeting.getNotes()+"\n");
+                    ","+serialContactSet(eachPastMeeting.getContacts())+","+eachPastMeeting.getNotes()+"\n");
             } else {
                 CSVFile.write("meeting,"+eachMeeting.getId()+","+serialDate(eachMeeting.getDate())+
                     ","+serialContactSet(eachMeeting.getContacts())+"\n");
@@ -268,31 +249,51 @@ public class ContactManagerImpl implements ContactManager {
         while (dataRow != null) {
             String[] stringArray = dataRow.split(",");
             // Checks to see if the line contains a contact or a meeting.
-            //if(stringArray)    
+            switch (stringArray[0]) {
+                case "contact":  
+                    loadContact(Integer.getInteger(stringArray[1]), stringArray[2], stringArray[3]);
+                    break;
+                case "meeting":
+                    //String[]
+                    //loadFutureMeeting(Integer.getInteger(stringArray[1], Calendar date, Set<Contact> attendees)
+                    break;
+                case "pastmeeting":
+                    addNewPastMeeting(allContacts, null, dataRow);
+                    break;
+            }
             dataRow = CSVFile.readLine();
         }
         CSVFile.close();
     }
     
+    private void loadFutureMeeting(int id, Calendar date, Set<Contact> attendees) {
+        Meeting newMeeting = new FutureMeetingImpl(id, date, attendees);
+        allMeetings.add(newMeeting);
+    }
+    
+    private void loadContact(int id, String name, String text) {
+        Contact newContact = new ContactImpl(id, name);
+        newContact.addNotes(text);
+        allContacts.add(newContact);
+    } 
+    
     private String serialDate(Calendar date) {
         // Serialises Calendar objects to a readable string.
-        return "["+
-                date.get(Calendar.YEAR)+","+
-                date.get(Calendar.MONTH)+","+
-                date.get(Calendar.DAY_OF_MONTH)+","+
-                date.get(Calendar.HOUR_OF_DAY)+","+
-                date.get(Calendar.MINUTE)+"]";
+        return  date.get(Calendar.YEAR)+"/"+
+                date.get(Calendar.MONTH)+"/"+
+                date.get(Calendar.DAY_OF_MONTH)+"/"+
+                date.get(Calendar.HOUR_OF_DAY)+"/"+
+                date.get(Calendar.MINUTE);
     }
     
     private String serialContactSet(Set<Contact> contactSet) {
         // Serialises contact sets to a string of their ids.
-        StringBuilder builder = new StringBuilder("[");
+        StringBuilder builder = new StringBuilder();
         String seperator = "";
         for(Contact each : contactSet) {
             builder.append(seperator).append(each.getId());
-            seperator = ",";
+            seperator = "/";
         }
-        builder.append("]");
         return builder.toString();
     }    
     
