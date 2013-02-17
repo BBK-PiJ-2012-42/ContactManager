@@ -2,9 +2,6 @@ package contactmanager;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import sun.security.pkcs11.wrapper.CK_SSL3_MASTER_KEY_DERIVE_PARAMS;
 
 /**
  *
@@ -21,8 +18,8 @@ public class ContactManagerImpl implements ContactManager {
         }
     };
 
-    public ContactManagerImpl() {
-        
+    public ContactManagerImpl() throws IOException {
+        initialise();
     }
     
     @Override
@@ -224,7 +221,7 @@ public class ContactManagerImpl implements ContactManager {
     
     private void printToFile() throws IOException {
         // Writes the current state of the ContactManager to a CSV File.
-        BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
+        BufferedWriter CSVFile = new BufferedWriter(new FileWriter("./contacts2.txt"));
         for(Contact eachContact : allContacts) {
             CSVFile.write("contact,"+eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
         }
@@ -249,18 +246,35 @@ public class ContactManagerImpl implements ContactManager {
         while (dataRow != null) {
             String[] stringArray = dataRow.split(",");
             // Checks to see if the line contains a contact or a meeting.
-            switch (stringArray[0]) {
-                case "contact":  
-                    loadContact(Integer.getInteger(stringArray[1]), stringArray[2], stringArray[3]);
-                    break;
-                case "meeting":
-                    //String[]
-                    //loadFutureMeeting(Integer.getInteger(stringArray[1], Calendar date, Set<Contact> attendees)
-                    break;
-                case "pastmeeting":
-                    addNewPastMeeting(allContacts, null, dataRow);
-                    break;
-            }
+            int newID = Integer.getInteger(stringArray[1]);
+            if(stringArray[0].equals("contact")) {
+                loadContact(newID, stringArray[2], stringArray[3]);
+            } else {
+                
+                // Deserialise the string into a Calendar Object.
+                String[] dateArray = stringArray[2].split("/");
+                Calendar newDate = new GregorianCalendar();
+                newDate.set(
+                        Integer.getInteger(dateArray[0]),
+                        Integer.getInteger(dateArray[1]),
+                        Integer.getInteger(dateArray[2]),
+                        Integer.getInteger(dateArray[3]),
+                        Integer.getInteger(dateArray[4]));
+                
+                
+                // Deserialise the string into a contact set.
+                String[] contactArray = stringArray[3].split("/");
+                Set<Contact> newContacts = new HashSet<>();
+                for(String eachIDasString : contactArray) {
+                    Contact newContact = getContactFromID(Integer.getInteger(eachIDasString));
+                    newContacts.add(newContact);
+                }
+                if(stringArray[0].equals("meeting")) {
+                    loadFutureMeeting(newID, newDate, newContacts);
+                } else if(stringArray[0].equals("pastmeeting")) {
+                    loadPastMeeting(newID, newDate, newContacts, stringArray[4]);
+                }      
+            }                  
             dataRow = CSVFile.readLine();
         }
         CSVFile.close();
@@ -268,6 +282,11 @@ public class ContactManagerImpl implements ContactManager {
     
     private void loadFutureMeeting(int id, Calendar date, Set<Contact> attendees) {
         Meeting newMeeting = new FutureMeetingImpl(id, date, attendees);
+        allMeetings.add(newMeeting);
+    }
+    
+    private void loadPastMeeting(int id, Calendar date, Set<Contact> attendees, String text) {
+        Meeting newMeeting = new PastMeetingImpl(id, date, attendees, text);
         allMeetings.add(newMeeting);
     }
     

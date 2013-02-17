@@ -4,6 +4,7 @@
  */
 package contactmanager;
 
+import java.io.IOException;
 import java.util.*;
 import javax.xml.crypto.Data;
 
@@ -12,11 +13,11 @@ import javax.xml.crypto.Data;
  * @author tom
  */
 public class Launch {
-    public static void main(String[] args) {
-        Launch.start();
+    public static void main(String[] args) throws IOException {
+        Launch.restart();
     }
     
-    public static void start() {
+    public static void start() throws IOException {
         ContactManager manager = new ContactManagerImpl();
         manager.addNewContact("Bill Smith", "");
         manager.addNewContact("Jim Smith", "");
@@ -44,7 +45,8 @@ public class Launch {
            
     }
     
-    public static void restart() {
-        
+    public static void restart() throws IOException {
+        ContactManager manager = new ContactManagerImpl();
+        manager.getContacts("Bill");
     }
 }
