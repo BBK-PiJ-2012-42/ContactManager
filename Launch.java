@@ -13,7 +13,7 @@ import javax.xml.crypto.Data;
  */
 public class Launch {
     public static void main(String[] args) {
-        Launch.start();
+        Launch.restart();
     }
     
     public static void start() {
@@ -29,11 +29,14 @@ public class Launch {
         }
         
         Calendar date = new GregorianCalendar();
-        date.set(Calendar.YEAR, 2013);
-        date.set(Calendar.MONTH, 3);
-        date.set(Calendar.DAY_OF_MONTH, 23);
+        date.set(2013, 03, 23, 14, 0) ;
         
         manager.addFutureMeeting(contacts, date);
         manager.flush();
+        
+    }
+    
+    public static void restart() {
+        
     }
 }

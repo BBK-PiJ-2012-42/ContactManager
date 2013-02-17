@@ -20,6 +20,10 @@ public class ContactManagerImpl implements ContactManager {
             return o1.getDate().compareTo(o2.getDate());
         }
     };
+
+    public ContactManagerImpl() {
+        writeLine("TEST TEST");
+    }
     
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
@@ -229,15 +233,51 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public void flush() {
-        writeLine("::CONTACTS::");
-        for(Contact eachContact : allContacts) {
-            writeLine(eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes());
-        }
-        writeLine("::MEETINGS::");
-        for(Meeting eachMeeting : allMeetings) {
-            writeLine(eachMeeting.getId()+","+eachMeeting.getDate());
+        try {
+            printToFile();
+        } catch (IOException ex) {
+            System.out.println(ex);
         }
     }
+    
+    private void printToFile() throws IOException {
+        // Writes the current state of the ContactManager to a CSV File.
+        BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
+        CSVFile.write("::CONTACTS::\n");
+        for(Contact eachContact : allContacts) {
+            CSVFile.write(eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
+        }
+        CSVFile.write("::MEETINGS::\n");
+        for(Meeting eachMeeting : allMeetings) {
+            CSVFile.write(eachMeeting.getId()+","+serialDate(eachMeeting.getDate())+
+                    ","+serialContactSet(eachMeeting.getContacts())+"\n");
+        }
+        CSVFile.close();
+    }
+    
+    private void initialise() throws IOException {
+        // Reads the state of the ContactManager from a CSV File.
+        BufferedReader CSVFile = new BufferedReader(new FileReader(fileName));
+        
+        CSVFile.close();
+    }
+    
+    private String serialDate(Calendar date) {
+        // Serialises Calendar objects to a readable string.
+        return "["+date.YEAR+","+date.MONTH+","+date.DAY_OF_MONTH+","+date.HOUR_OF_DAY+","+date.MINUTE+"]";
+    }
+    
+    private String serialContactSet(Set<Contact> contactSet) {
+        // Serialises contact sets to a string of their ids.
+        StringBuilder builder = new StringBuilder("[");
+        String seperator = "";
+        for(Contact each : contactSet) {
+            builder.append(seperator).append(each.getId());
+            seperator = ",";
+        }
+        builder.append("]");
+        return builder.toString();
+    }    
     
     private Calendar timeNow() {
         return Calendar.getInstance();
@@ -307,11 +347,12 @@ public class ContactManagerImpl implements ContactManager {
         return null;
     }
     
-    private void writeLine(String line) {
+    public void writeLine(String line) {
         try {
             BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
             CSVFile.write(line);
             CSVFile.newLine();
+            CSVFile.close();
         } catch (IOException ex) {
             //Logger.getLogger(ContactManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
         }        
