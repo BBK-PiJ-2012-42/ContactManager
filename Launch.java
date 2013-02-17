@@ -30,26 +30,18 @@ public class Launch {
         
         Calendar date = new GregorianCalendar();
         date.set(2013, 03, 23, 14, 0);
-        System.out.println(date.toString());
+        Calendar date2 = new GregorianCalendar();
+        date2.set(2013, 05, 10, 14, 0);
         
         Calendar oldDate = new GregorianCalendar();
-        date.set(2013, 01, 23, 14, 0);
+        oldDate.set(2013, 01, 23, 14, 0);
         
         manager.addFutureMeeting(contacts, date);
-        
+        manager.addFutureMeeting(contacts, date2);
         manager.addNewPastMeeting(contacts, oldDate, "We all agreed that was a great meeting.");
         
         manager.flush();
-        
-        Set<Contact> newcontacts = manager.getContacts("Bill");
-        for(Contact each : newcontacts) {
-            List<PastMeeting> meets = manager.getPastMeetingList(each);
-            System.out.println(meets.get(0));
-        }
-        
-        
-        
-        
+           
     }
     
     public static void restart() {

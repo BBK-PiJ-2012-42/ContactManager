@@ -11,7 +11,7 @@ package contactmanager;
 public class ContactImpl implements Contact {
     private int id;
     private String name;
-    private String notes = null;
+    private String notes = "";
     
     public ContactImpl(int id, String name) {
         this.id = id;
@@ -36,9 +36,6 @@ public class ContactImpl implements Contact {
 
     @Override
     public void addNotes(String note) {
-        if(notes != null) {
-            notes += "\n";
-        }
         notes += note;
     }
     

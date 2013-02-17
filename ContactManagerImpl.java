@@ -22,7 +22,7 @@ public class ContactManagerImpl implements ContactManager {
     };
 
     public ContactManagerImpl() {
-        writeLine("TEST TEST");
+        
     }
     
     @Override
@@ -122,12 +122,12 @@ public class ContactManagerImpl implements ContactManager {
         if(contactExists(contact)) {
             Iterator meetingIterator = allMeetings.iterator();
             Meeting nextMeeting;
-            Calendar nextCal;
+            //Calendar nextCal;
             List<PastMeeting> returnList = new ArrayList<>();
             while(meetingIterator.hasNext()) {
                 nextMeeting = (Meeting) meetingIterator.next();
-                nextCal = nextMeeting.getDate();
-                if(nextCal.after(timeNow()) && nextMeeting.getContacts().contains(contact)) {
+                //nextCal = nextMeeting.getDate();
+                if(nextMeeting instanceof PastMeeting && nextMeeting.getContacts().contains(contact)) {
                     returnList.add((PastMeeting) nextMeeting);
                 }
             }
@@ -144,10 +144,8 @@ public class ContactManagerImpl implements ContactManager {
         if(contacts.isEmpty() || !contactsExist(contacts)) {
             throw new IllegalArgumentException();
         } else if(contacts != null && date != null && text != null) {
-            PastMeetingImpl newMeeting = new PastMeetingImpl(generateMeetingId(), date, contacts);
-            newMeeting.setNotes(text);
-            //
-            System.out.println("past");
+            PastMeeting newMeeting = new PastMeetingImpl(generateMeetingId(), date, contacts, text);
+            allMeetings.add(newMeeting);
         } else {
             throw new NullPointerException();
         }
@@ -245,13 +243,11 @@ public class ContactManagerImpl implements ContactManager {
     private void printToFile() throws IOException {
         // Writes the current state of the ContactManager to a CSV File.
         BufferedWriter CSVFile = new BufferedWriter(new FileWriter(fileName));
-        //CSVFile.write("::CONTACTS::\n");
         for(Contact eachContact : allContacts) {
             CSVFile.write("contact,"+eachContact.getId()+","+eachContact.getName()+","+eachContact.getNotes()+"\n");
         }
-        //CSVFile.write("::MEETINGS::\n");
         for(Meeting eachMeeting : allMeetings) {
-            if(eachMeeting instanceof PastMeetingImpl) {
+            if(eachMeeting instanceof PastMeeting) {
                 System.out.println("PAST");
                 PastMeeting eachPastMeeting = (PastMeeting) eachMeeting;
                 CSVFile.write("pastmeeting,"+eachPastMeeting.getId()+","+serialDate(eachPastMeeting.getDate())+
@@ -260,7 +256,6 @@ public class ContactManagerImpl implements ContactManager {
                 CSVFile.write("meeting,"+eachMeeting.getId()+","+serialDate(eachMeeting.getDate())+
                     ","+serialContactSet(eachMeeting.getContacts())+"\n");
             }
-
         }
         CSVFile.close();
     }
